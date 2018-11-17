@@ -18,12 +18,13 @@ class Mqtt implements pubsub.PubSub {
 	}
 	
 	public function publish(topic:String, payload:Chunk):Promise<Noise> {
-		if(!MqttLib.isValidTopic(topic)) return new Error('Invalid topic');
-		return (client.isConnected.value ? Promise.NOISE : client.connect())
-			.next(function(_) return publish(topic, payload));
+		return
+			if(!MqttLib.isValidTopic(topic)) new Error('Invalid topic');
+			else(client.isConnected.value ? Promise.NOISE : client.connect())
+				.next(function(_) return publish(topic, payload));
 	}
 	
-	public function subscribe(pattern:String, handler:Callback<Chunk>):CallbackLink {
+	public function subscribe(pattern:String, handler:Callback<Pair<String, Chunk>>):CallbackLink {
 		if(!MqttLib.isValidPattern(pattern)) return null; // TODO: maybe need some warning?
 		
 		subscriptions[pattern] =
@@ -36,7 +37,7 @@ class Mqtt implements pubsub.PubSub {
 			}
 		
 		return
-			client.message.handle(function(message) if(MqttLib.match(message.a, pattern)) handler.invoke(message.b)) &
+			client.message.handle(function(message) if(MqttLib.match(message.a, pattern)) handler.invoke(message)) &
 			unsubscribe.bind(pattern);
 	}
 	
