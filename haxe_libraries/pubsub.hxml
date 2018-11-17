@@ -1,0 +1,4 @@
+-cp src
+-D pubsub
+
+-lib tink_chunk

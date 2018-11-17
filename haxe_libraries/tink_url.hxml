@@ -1,0 +1,4 @@
+-D tink_url=0.4.1
+# @install: lix --silent download "gh://github.com/haxetink/tink_url#3426a1b736c1cf39c05724ef0d6edbab0fdff331" into tink_url/0.4.1/github/3426a1b736c1cf39c05724ef0d6edbab0fdff331
+-lib tink_stringly
+-cp ${HAXE_LIBCACHE}/tink_url/0.4.1/github/3426a1b736c1cf39c05724ef0d6edbab0fdff331/src

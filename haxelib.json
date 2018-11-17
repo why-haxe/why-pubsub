@@ -1,0 +1,16 @@
+{
+  "name": "pubsub",
+  "license": "MIT",
+  "tags": [
+    "pubsub"
+  ],
+  "classPath": "src",
+  "contributors": [
+    "kevinresol"
+  ],
+  "releasenote": "initial release",
+  "version": "0.0.0",
+  "dependencies": {
+    "tink_chunk": ""
+  }
+}
