@@ -1,4 +1,4 @@
-package pubsub.driver.mqtt;
+package why.pubsub.mqtt;
 
 import mqtt.Mqtt as MqttLib;
 import mqtt.Client as MqttClient;
@@ -6,7 +6,7 @@ import tink.Chunk;
 
 using tink.CoreApi;
 
-class Mqtt implements pubsub.driver.Driver {
+class Mqtt implements why.pubsub.Driver {
 	
 	var client:MqttClient;
 	

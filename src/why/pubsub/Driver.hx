@@ -1,4 +1,4 @@
-package pubsub.driver;
+package why.pubsub;
 
 import tink.Chunk;
 

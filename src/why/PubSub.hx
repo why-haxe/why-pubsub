@@ -1,13 +1,13 @@
-package pubsub;
+package why;
 
 import tink.Chunk;
-import pubsub.driver.Driver;
+import why.pubsub.Driver;
 
 using tink.CoreApi;
 
 #if !macro
 
-@:autoBuild(pubsub.PubSub.build())
+@:autoBuild(why.PubSub.build())
 class PubSub {
 	var driver:Driver;
 	
@@ -16,7 +16,7 @@ class PubSub {
 	}
 }
 
-@:genericBuild(pubsub.PubSub.buildField())
+@:genericBuild(why.PubSub.buildField())
 class Field<T> {}
 
 class FieldBase<T> {
@@ -85,13 +85,13 @@ class PubSub {
 						case [pubs, subs, pubsubs]:
 							var pubs = macro $a{unique(pubs.concat(pubsubs)).map(function(s) return macro $v{s})};
 							var subs = macro $a{unique(subs.concat(pubsubs)).map(function(s) return macro $v{s})};
-							member.kind = FProp('get', 'null', macro:pubsub.PubSub.FieldBase<$ct>, null);
+							member.kind = FProp('get', 'null', macro:why.PubSub.FieldBase<$ct>, null);
 							
 							var field = macro $i{member.name};
 							var getter = 'get_' + member.name;
 							builder.addMembers(macro class {
 								function $getter() {
-									if($field == null) $field = new pubsub.PubSub.FieldBase<$ct>($pubs, $subs, driver, $serializer, $unserializer);
+									if($field == null) $field = new why.PubSub.FieldBase<$ct>($pubs, $subs, driver, $serializer, $unserializer);
 									return $field;
 								}
 							});
