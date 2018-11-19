@@ -1,9 +1,6 @@
 package why;
 
-import tink.Chunk;
 import why.pubsub.Driver;
-
-using tink.CoreApi;
 
 #if !macro
 
@@ -13,35 +10,6 @@ class PubSub {
 	
 	public function new(driver) {
 		this.driver = driver;
-	}
-}
-
-@:genericBuild(why.PubSub.buildField())
-class Field<T> {}
-
-class FieldBase<T> {
-	var pubs:Array<String>;
-	var subs:Array<String>;
-	var driver:Driver;
-	var serialize:T->Chunk;
-	var unserialize:Chunk->T;
-	
-	public function new(pubs, subs, driver, serialize, unserialize) {
-		this.pubs = pubs;
-		this.subs = subs;
-		this.driver = driver;
-		this.serialize = serialize;
-		this.unserialize = unserialize;
-	}
-	
-	public function publish(value:T):Promise<Noise> {
-		var payload = serialize(value);
-		return Promise.inParallel([for(topic in pubs) driver.publish(topic, payload)]);
-	}
-	
-	public function subscribe(handler:Callback<T>):CallbackLink {
-		function callback(pair:Pair<String, Chunk>) handler.invoke(unserialize(pair.b));
-		return [for(topic in subs) driver.subscribe(topic, callback)];
 	}
 }
 
@@ -81,21 +49,20 @@ class PubSub {
 					}
 					
 					switch [extractTopics(':pub'), extractTopics(':sub'), extractTopics(':pubsub')] {
-						case [[], [], _]: // skip
+						case [[], [], []]: // skip
 						case [pubs, subs, pubsubs]:
 							var pubs = macro $a{unique(pubs.concat(pubsubs)).map(function(s) return macro $v{s})};
 							var subs = macro $a{unique(subs.concat(pubsubs)).map(function(s) return macro $v{s})};
-							member.kind = FProp('get', 'null', macro:why.PubSub.FieldBase<$ct>, null);
+							member.kind = FProp('get', 'null', macro:why.pubsub.Field<$ct>, null);
 							
 							var field = macro $i{member.name};
 							var getter = 'get_' + member.name;
 							builder.addMembers(macro class {
 								function $getter() {
-									if($field == null) $field = new why.PubSub.FieldBase<$ct>($pubs, $subs, driver, $serializer, $unserializer);
+									if($field == null) $field = new why.pubsub.Field<$ct>($pubs, $subs, driver, $serializer, $unserializer);
 									return $field;
 								}
 							});
-							member.publish();
 					}
 				
 				case _:
