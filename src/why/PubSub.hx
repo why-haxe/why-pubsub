@@ -1,15 +1,15 @@
 package why;
 
-import why.pubsub.Driver;
+import why.pubsub.Adapter;
 
 #if !macro
 
 @:autoBuild(why.PubSub.build())
 class PubSub {
-	var driver:Driver;
+	var adapter:Adapter;
 	
-	public function new(driver) {
-		this.driver = driver;
+	public function new(adapter) {
+		this.adapter = adapter;
 	}
 }
 
@@ -59,7 +59,7 @@ class PubSub {
 							var getter = 'get_' + member.name;
 							builder.addMembers(macro class {
 								function $getter() {
-									if($field == null) $field = new why.pubsub.Field<$ct>($pubs, $subs, driver, $serializer, $unserializer);
+									if($field == null) $field = new why.pubsub.Field<$ct>($pubs, $subs, adapter, $serializer, $unserializer);
 									return $field;
 								}
 							});
