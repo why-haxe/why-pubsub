@@ -2,3 +2,4 @@
 -D pubsub
 
 -lib tink_chunk
+-lib tink_json
