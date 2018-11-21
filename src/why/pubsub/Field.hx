@@ -26,11 +26,10 @@ class Field<Abstract, Concrete, Data> {
 		return Promise.inParallel([for(topic in pubs) adapter.publish(topic, payload)]);
 	}
 	
-	public function subscribe(handler:Callback<Pair<Abstract, Data>>):Promise<CallbackLink> {
-		function callback(pair:Pair<Concrete, Chunk>)
-			handler.invoke(new Pair(translator.abstractify(pair.a), unserialize(pair.b)));
+	public function subscribe(handler:Callback<Outcome<Pair<Abstract, Data>, Error>>):CallbackLink {
+		function callback(o:Outcome<Pair<Concrete, Chunk>, Error>)
+			handler.invoke(o.map(function(pair) return new Pair(translator.abstractify(pair.a), unserialize(pair.b))));
 			
-		return Promise.inParallel([for(topic in subs) adapter.subscribe(topic, callback)])
-			.next(CallbackLink.fromMany);
+		return [for(topic in subs) adapter.subscribe(topic, callback)];
 	}
 }

@@ -22,9 +22,16 @@ class Ble implements why.pubsub.Adapter<Target> {
 			.next(function(characteristic) return characteristic.write(payload, target.withoutResponse));
 	}
 	
-	public function subscribe(target:Target, handler:Callback<Pair<Target, Chunk>>):Promise<CallbackLink> {
-		return getCharacteristic(target)
-			.next(function(characteristic) return characteristic.subscribe(function(chunk) handler.invoke(new Pair(target, chunk))));
+	public function subscribe(target:Target, handler:Callback<Outcome<Pair<Target, Chunk>, Error>>):CallbackLink {
+		var link = getCharacteristic(target)
+			.handle(function(o) switch o {
+				case Success(characteristic):
+					characteristic.subscribe(function(o) handler.invoke(o.map(function(chunk) return new Pair(target, chunk))));
+				case Failure(e):
+					handler.invoke(Failure(e));
+			});
+			
+		return function() link.dissolve();
 	}
 	
 	function getCharacteristic(target:Target):Promise<Characteristic> {

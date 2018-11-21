@@ -27,8 +27,9 @@ class Mqtt implements why.pubsub.Adapter<String> {
 				.next(function(_) return publish(topic, payload));
 	}
 	
-	public function subscribe(pattern:String, handler:Callback<Pair<String, Chunk>>):Promise<CallbackLink> {
-		if(!MqttLib.isValidPattern(pattern)) return new Error(BadRequest, 'Invalid topic filter');
+	public function subscribe(pattern:String, handler:Callback<Outcome<Pair<String, Chunk>, Error>>):CallbackLink {
+		if(!MqttLib.isValidPattern(pattern))
+			handler.invoke(Failure(new Error(BadRequest, 'Invalid topic filter')));
 		
 		subscriptions[pattern] =
 			switch subscriptions[pattern] {
@@ -40,7 +41,7 @@ class Mqtt implements why.pubsub.Adapter<String> {
 			}
 		
 		return
-			client.message.handle(function(message) if(MqttLib.match(message.a, pattern)) handler.invoke(message)) &
+			client.message.handle(function(message) if(MqttLib.match(message.a, pattern)) handler.invoke(Success(message))) &
 			unsubscribe.bind(pattern);
 	}
 	
