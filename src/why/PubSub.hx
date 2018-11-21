@@ -43,7 +43,7 @@ class PubSub {
 					}
 					
 					var unserializer = switch member.metaNamed(':pubsubUnerializer') {
-						case []: macro function(c:tink.Chunk):$ct return tink.Json.parse(c);
+						case []: macro function(pair:tink.core.Pair<String, tink.Chunk>):$ct return tink.Json.parse(pair.b);
 						case [{params: [e]}]: e;
 						case _: member.pos.error('Invalid use of @:pubsubUnerializer');
 					}

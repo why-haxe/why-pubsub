@@ -9,7 +9,7 @@ class Field<T> {
 	var subs:Array<String>;
 	var adapter:Adapter;
 	var serialize:T->Chunk;
-	var unserialize:Chunk->T;
+	var unserialize:Pair<String, Chunk>->T;
 	
 	public function new(pubs, subs, adapter, serialize, unserialize) {
 		this.pubs = pubs;
@@ -25,7 +25,7 @@ class Field<T> {
 	}
 	
 	public function subscribe(handler:Callback<T>):CallbackLink {
-		function callback(pair:Pair<String, Chunk>) handler.invoke(unserialize(pair.b));
+		function callback(pair:Pair<String, Chunk>) handler.invoke(unserialize(pair));
 		return [for(topic in subs) adapter.subscribe(topic, callback)];
 	}
 }
