@@ -6,5 +6,5 @@ using tink.CoreApi;
 
 interface Adapter {
 	function publish(topic:String, payload:Chunk):Promise<Noise>;
-	function subscribe(topic:String, handler:Callback<Pair<String, Chunk>>):CallbackLink;
+	function subscribe(topic:String, handler:Callback<Pair<String, Chunk>>):Promise<CallbackLink>;
 }

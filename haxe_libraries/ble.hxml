@@ -1,0 +1,4 @@
+-D ble=0.0.0
+# @install: lix --silent download "gh://github.com/kevinresol/ble#89a50586ddb087221ea3df5037c4d4e570d441f1" into ble/0.0.0/github/89a50586ddb087221ea3df5037c4d4e570d441f1
+-lib tink_state
+-cp ${HAXE_LIBCACHE}/ble/0.0.0/github/89a50586ddb087221ea3df5037c4d4e570d441f1/src

@@ -1,4 +1,7 @@
 -cp tests
 -main RunTests
--dce full
+# -dce full
 -lib mqtt
+-lib ble
+
+-D analyzer-optimize

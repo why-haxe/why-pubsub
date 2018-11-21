@@ -24,8 +24,9 @@ class Field<T> {
 		return Promise.inParallel([for(topic in pubs) adapter.publish(topic, payload)]);
 	}
 	
-	public function subscribe(handler:Callback<T>):CallbackLink {
+	public function subscribe(handler:Callback<T>):Promise<CallbackLink> {
 		function callback(pair:Pair<String, Chunk>) handler.invoke(unserialize(pair));
-		return [for(topic in subs) adapter.subscribe(topic, callback)];
+		return Promise.inParallel([for(topic in subs) adapter.subscribe(topic, callback)])
+			.next(CallbackLink.fromMany);
 	}
 }

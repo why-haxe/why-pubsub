@@ -6,6 +6,9 @@ import tink.Chunk;
 
 using tink.CoreApi;
 
+/**
+ * MQTT
+ */
 class Mqtt implements why.pubsub.Adapter {
 	
 	var client:MqttClient;
@@ -24,8 +27,8 @@ class Mqtt implements why.pubsub.Adapter {
 				.next(function(_) return publish(topic, payload));
 	}
 	
-	public function subscribe(pattern:String, handler:Callback<Pair<String, Chunk>>):CallbackLink {
-		if(!MqttLib.isValidPattern(pattern)) return null; // TODO: maybe need some warning?
+	public function subscribe(pattern:String, handler:Callback<Pair<String, Chunk>>):Promise<CallbackLink> {
+		if(!MqttLib.isValidPattern(pattern)) return new Error(BadRequest, 'Invalid topic filter');
 		
 		subscriptions[pattern] =
 			switch subscriptions[pattern] {
