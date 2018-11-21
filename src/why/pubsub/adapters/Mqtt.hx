@@ -9,7 +9,7 @@ using tink.CoreApi;
 /**
  * MQTT
  */
-class Mqtt implements why.pubsub.Adapter {
+class Mqtt implements why.pubsub.Adapter<String> {
 	
 	var client:MqttClient;
 	

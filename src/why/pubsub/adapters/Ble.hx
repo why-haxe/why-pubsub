@@ -9,7 +9,7 @@ using tink.CoreApi;
 /**
  * Bluetooth Low Energy (Central Role)
  */
-class Ble implements why.pubsub.Adapter {
+class Ble implements why.pubsub.Adapter<Target> {
 	
 	var central:Central;
 	
@@ -17,22 +17,14 @@ class Ble implements why.pubsub.Adapter {
 		this.central = central;
 	}
 	
-	public function publish(topic:String, payload:Chunk):Promise<Noise> {
-		return switch parse(topic) {
-			case Success(target):
-				getCharacteristic(target)
-					.next(function(characteristic) return characteristic.write(payload, target.withoutResponse));
-			case Failure(e): e;
-		}
+	public function publish(target:Target, payload:Chunk):Promise<Noise> {
+		return getCharacteristic(target)
+			.next(function(characteristic) return characteristic.write(payload, target.withoutResponse));
 	}
 	
-	public function subscribe(topic:String, handler:Callback<Pair<String, Chunk>>):Promise<CallbackLink> {
-		return switch parse(topic) {
-			case Success(target):
-				getCharacteristic(target)
-					.next(function(characteristic) return characteristic.subscribe(function(chunk) handler.invoke(new Pair(topic, chunk))));
-			case Failure(e): e;
-		}
+	public function subscribe(target:Target, handler:Callback<Pair<Target, Chunk>>):Promise<CallbackLink> {
+		return getCharacteristic(target)
+			.next(function(characteristic) return characteristic.subscribe(function(chunk) handler.invoke(new Pair(target, chunk))));
 	}
 	
 	function getCharacteristic(target:Target):Promise<Characteristic> {
@@ -52,20 +44,17 @@ class Ble implements why.pubsub.Adapter {
 			});
 	}
 	
-	function parse(topic:String):Outcome<Target, Error> {
+	public static function parse(topic:String):Target {
 		return switch topic.split('/') {
-			case [id, service, characteristic]: Success(new Target(id, service, characteristic, false));
-			case [id, service, characteristic, 'true']: Success(new Target(id, service, characteristic, true));
-			case [id, service, characteristic, 'false']: Success(new Target(id, service, characteristic, false));
-			case _: Failure(new Error('Invalid topic format, expected: "<peripheral_id>/<service_uuid>/<characteristic_uuid>/[<write_without_response>]"'));
+			case [id, service, characteristic]: makeTarget(id, service, characteristic);
+			case [id, service, characteristic, 'true']: makeTarget(id, service, characteristic, true);
+			case [id, service, characteristic, 'false']: makeTarget(id, service, characteristic, false);
+			case _: throw 'Invalid topic format, expected: "<peripheral_id>/<service_uuid>/<characteristic_uuid>/[<write_without_response>]"';
 		}
 	}
-}
-
-@:forward
-private abstract Target(TargetObject) {
-	public inline function new(id, service, characteristic, withoutResponse)
-		this = {
+	
+	static inline function makeTarget(id, service, characteristic, ?withoutResponse):Target
+		return {
 			id: id,
 			service: service,
 			characteristic: characteristic,
@@ -73,9 +62,10 @@ private abstract Target(TargetObject) {
 		}
 }
 
-private typedef TargetObject = {
-	id:String,
-	service:Uuid,
-	characteristic:Uuid,
-	withoutResponse:Bool,
+@:structInit
+class Target {
+	public var id(default, never):String;
+	public var service(default, never):Uuid;
+	public var characteristic(default, never):Uuid;
+	@:optional public var withoutResponse(default, never):Bool;
 }

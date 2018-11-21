@@ -4,7 +4,7 @@ import tink.Chunk;
 
 using tink.CoreApi;
 
-interface Adapter {
-	function publish(topic:String, payload:Chunk):Promise<Noise>;
-	function subscribe(topic:String, handler:Callback<Pair<String, Chunk>>):Promise<CallbackLink>;
+interface Adapter<Topic> {
+	function publish(topic:Topic, payload:Chunk):Promise<Noise>;
+	function subscribe(topic:Topic, handler:Callback<Pair<Topic, Chunk>>):Promise<CallbackLink>;
 }

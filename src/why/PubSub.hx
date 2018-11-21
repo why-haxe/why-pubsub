@@ -1,15 +1,18 @@
 package why;
 
 import why.pubsub.Adapter;
+import why.pubsub.Translator;
 
 #if !macro
 
 @:autoBuild(why.PubSub.build())
-class PubSub {
-	var adapter:Adapter;
+class PubSub<Abstract, Concrete> {
+	var adapter:Adapter<Concrete>;
+	var translator:Translator<Abstract, Concrete>;
 	
-	public function new(adapter) {
+	public function new(adapter, translator) {
 		this.adapter = adapter;
+		this.translator = translator;
 	}
 }
 
@@ -21,6 +24,8 @@ using tink.MacroApi;
 class PubSub {
 	public static function build() {
 		var builder = new ClassBuilder();
+		var abs = builder.target.superClass.params[0].toComplex();
+		var conc = builder.target.superClass.params[1].toComplex();
 		
 		for(member in builder) {
 			
@@ -29,10 +34,7 @@ class PubSub {
 					function extractTopics(name:String) {
 						return switch member.metaNamed(name) {
 							case []: [];
-							case meta:
-								var topics = [];
-								for(m in meta) topics = topics.concat(m.params.map(function(e) return e.getString().sure()));
-								topics;
+							case meta: [for(m in meta) for(e in m.params) macro @:pos(e.pos) ($e:$abs)];
 						}
 					}
 					
@@ -43,7 +45,7 @@ class PubSub {
 					}
 					
 					var unserializer = switch member.metaNamed(':pubsubUnerializer') {
-						case []: macro function(pair:tink.core.Pair<String, tink.Chunk>):$ct return tink.Json.parse(pair.b);
+						case []: macro function(data:tink.Chunk):$ct return tink.Json.parse(data);
 						case [{params: [e]}]: e;
 						case _: member.pos.error('Invalid use of @:pubsubUnerializer');
 					}
@@ -51,15 +53,16 @@ class PubSub {
 					switch [extractTopics(':pub'), extractTopics(':sub'), extractTopics(':pubsub')] {
 						case [[], [], []]: // skip
 						case [pubs, subs, pubsubs]:
-							var pubs = macro $a{unique(pubs.concat(pubsubs)).map(function(s) return macro $v{s})};
-							var subs = macro $a{unique(subs.concat(pubsubs)).map(function(s) return macro $v{s})};
-							member.kind = FProp('get', 'null', macro:why.pubsub.Field<$ct>, null);
+							var pubs = macro $a{pubs.concat(pubsubs)};
+							var subs = macro $a{subs.concat(pubsubs)};
+							member.kind = FProp('get', 'null', macro:why.pubsub.Field<$abs, $conc, $ct>, null);
 							
 							var field = macro $i{member.name};
 							var getter = 'get_' + member.name;
 							builder.addMembers(macro class {
 								function $getter() {
-									if($field == null) $field = new why.pubsub.Field<$ct>($pubs, $subs, adapter, $serializer, $unserializer);
+									if($field == null)
+										$field = new why.pubsub.Field<$abs, $conc, $ct>(adapter, translator, $pubs, $subs, $serializer, $unserializer);
 									return $field;
 								}
 							});
