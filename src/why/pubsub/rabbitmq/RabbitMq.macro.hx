@@ -16,9 +16,9 @@ class RabbitMq {
 				public final publishers:$pubCt;
 				public final subscribers:$subCt;
 				
-				public function new(manager:amqp.AmqpConnectionManager) {
+				public function new(manager) {
 					publishers = new why.pubsub.rabbitmq.Publishers<$pubCt>(manager);
-					subscribers = null;
+					subscribers = new why.pubsub.rabbitmq.Subscribers<$subCt>(manager);
 				}
 			}
 		});

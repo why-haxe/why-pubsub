@@ -6,9 +6,9 @@ import tink.macro.BuildCache;
 
 using tink.MacroApi;
 
-class Publishers {
+class Subscribers {
 	public static function build() {
-		return BuildCache.getType('why.pubsub.rabbitmq.Publishers', (ctx:BuildContext) -> {
+		return BuildCache.getType('why.pubsub.rabbitmq.Subscribers', (ctx:BuildContext) -> {
 			var name = ctx.name;
 			var type = ctx.type;
 			var ct = type.toComplex();
@@ -19,7 +19,7 @@ class Publishers {
 			
 			var fields = getFields(ctx.type, ctx.pos);
 			
-			var def = macro class $name extends why.pubsub.rabbitmq.Publishers.PublishersBase implements $tp {}
+			var def = macro class $name extends why.pubsub.rabbitmq.Subscribers.SubscribersBase implements $tp {}
 			
 			for(f in fields) {
 				var ct = f.type.toComplex();
@@ -28,7 +28,7 @@ class Publishers {
 				var getter = 'get_$name';
 				var config = switch f.meta.extract(':why.pubsub.rabbitmq') {
 					case []: f.pos.error('Missing config via meta @:why.pubsub.rabbitmq');
-					case [{params: [expr]}]: macro ($expr:why.pubsub.rabbitmq.Publisher.PublisherConfig<$msgCt>);
+					case [{params: [expr]}]: macro ($expr:why.pubsub.rabbitmq.Subscriber.SubscriberConfig<$msgCt>);
 					case [{pos: pos}]: pos.error('@:why.pubsub.rabbitmq requires exactly one parameter');
 					case _: f.pos.error('Only one @:why.pubsub.rabbitmq is allowed');
 				}
@@ -37,7 +37,7 @@ class Publishers {
 					public var $name(get, null):$ct;
 					function $getter():$ct {
 						if($i{name} == null)
-							$i{name} = new why.pubsub.rabbitmq.Publisher(manager, $config);
+							$i{name} = new why.pubsub.rabbitmq.Subscriber(manager, $config);
 						return $i{name};
 					}
 				}).fields);
@@ -52,7 +52,7 @@ class Publishers {
 		return switch type {
 			case TInst(_.get() => {isInterface: true, fields: _.get() => fields}, _): 
 				[for(f in fields) switch f.type {
-					case TInst(_.get() => {pack: ['why', 'pubsub'], name: 'Publisher'}, [msg]):
+					case TInst(_.get() => {pack: ['why', 'pubsub'], name: 'Subscriber'}, [msg]):
 						{
 							name: f.name,
 							pos: f.pos,
@@ -61,7 +61,7 @@ class Publishers {
 							messageType: msg,
 						}
 					case v:
-						f.pos.error('Only why.pubsub.Publisher<T> is supported here but got (${v.getID()})');
+						f.pos.error('Only why.pubsub.Subscriber<T> is supported here but got (${v.getID()})');
 				}];
 			case _:
 				pos.error('Expected interface');

@@ -1,7 +1,10 @@
 package why.pubsub;
 
+import tink.core.ext.Subscription;
 using tink.CoreApi;
 
+typedef Handler<T> = Envelope<T>->Void;
+
 interface Subscriber<Message> {
-	function subscribe(handler:Envelope<Message>->Void):Subscription;
+	function subscribe(handler:Handler<Message>):Subscription;
 }
