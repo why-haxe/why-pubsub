@@ -12,20 +12,31 @@ class RabbitMqTest {
 	public function test() {
 		var manager = amqp.AmqpConnectionManager.connect(['amqp://localhost']);
 		var rabbitmq = new why.pubsub.rabbitmq.RabbitMq<Publishers, Subscribers>(manager);
-		rabbitmq.publishers.foo.publish({foo: 1, bar: 'a'}).eager();
 		
-		var subscription = rabbitmq.subscribers.bar.subscribe(envelope -> switch envelope.content {
-			case Success(message):
-				envelope.ack();
-				asserts.assert(message.foo == 1);
-				asserts.assert(message.bar == 'a');
-				asserts.done();
-			case Failure(e):
-				envelope.ack();
-				asserts.fail(e);
-		});
-		
-		subscription.error.handle(e -> trace(e));
+		rabbitmq
+			.sync({
+				exchanges: [{name: 'foo', type: 'fanout'}],
+				queues: [{name: 'bar', bindings: [{exchange: 'foo', pattern: ''}]}],
+			})
+			.handle(function(o) switch o {
+				case Success(_):
+					rabbitmq.publishers.foo.publish({foo: 1, bar: 'a'}).eager();
+					
+					var subscription = rabbitmq.subscribers.bar.subscribe(envelope -> switch envelope.content {
+						case Success(message):
+							envelope.ack();
+							asserts.assert(message.foo == 1);
+							asserts.assert(message.bar == 'a');
+							asserts.done();
+						case Failure(e):
+							envelope.ack();
+							asserts.fail(e);
+					});
+					
+					subscription.error.handle(e -> trace(e));
+				case Failure(e):
+					asserts.fail(e);
+			});
 		
 		return asserts;
 	}

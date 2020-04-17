@@ -12,11 +12,12 @@ class RabbitMq {
 			var subType = ctx.type2;
 			var pubCt = pubType.toComplex();
 			var subCt = subType.toComplex();
-			macro class $name {
+			macro class $name extends why.pubsub.rabbitmq.RabbitMq.RabbitMqBase {
 				public final publishers:$pubCt;
 				public final subscribers:$subCt;
 				
 				public function new(manager) {
+					super(manager);
 					publishers = new why.pubsub.rabbitmq.Publishers<$pubCt>(manager);
 					subscribers = new why.pubsub.rabbitmq.Subscribers<$subCt>(manager);
 				}
