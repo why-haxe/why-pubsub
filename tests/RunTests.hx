@@ -24,8 +24,70 @@ class RunTests {
     $type(mqtt.plain);
     $type(mqtt.foo.publish({data:''}));
     $type(mqtt.foo.subscribe(function(o) trace($type(o))));
+    
+    
+    
+    
+    
+    
+    amqp.foo.subscribe();
+    
   }
 }
+
+
+class AmqpMagic {
+    var translator:Translator;
+    var manager = AmqpConnectionManager.connect(['amqp://localhost/dasloop']);
+    
+    var foo = {
+      var channel = Amqp.createChannel();
+      var exchange = 'raw';
+      var queue = 'general_report';
+      var key = '';
+      
+      var error = Future.trigger();
+      
+      var channel = manager.createChannel({
+        setup: channel -> cast channel.assertExchange(exchange, 'fanout')
+          .then(_ -> channel.assertQueue(queue))
+          .then(_ -> channel.bindQueue(queue, exchange, key)),
+      });
+      
+      // channel.on('error', e -> error.trigger(Error.ofJsError(e)));
+      
+      {
+        publish:
+          function(payload:Chunk) {
+            return new Promise((resolve, reject) -> {
+              function send() {
+                if(channel.publish(exchange, key, payload.toBuffer()))
+                  resolve(Noise);
+                else 
+                  channel.once('drain', send);
+              }
+            });
+          },
+        subscribe:
+          function(handler:AmqpMsg->Void) {
+            
+            var tag:Promise<String>;
+            
+            channel.addSetup(function setup(channel) {
+              var ret = channel.consume(queue, handler);
+              tag = Promise.ofJsPromise(ret).next(o -> o.consumerTag);
+              return ret;
+            });
+            
+            return new SimpleSubscription(
+              () -> channel.removeSetup(setup, channel -> tag.next(channel.cancel).eager()),
+              error
+            );
+          }
+      }
+    }
+}
+
 
 class Magic<T> extends why.PubSub<String, T> {
   @:pubsub('dasloop_id')

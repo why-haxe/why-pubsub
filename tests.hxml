@@ -2,6 +2,6 @@
 -main RunTests
 # -dce full
 -lib mqtt
--lib ble
+-lib why-ble
 
 -D analyzer-optimize

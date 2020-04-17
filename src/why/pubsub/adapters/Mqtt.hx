@@ -2,6 +2,8 @@ package why.pubsub.adapters;
 
 import mqtt.Mqtt as MqttLib;
 import mqtt.Client as MqttClient;
+import mqtt.Message as MqttMessage;
+import tink.core.ext.Subscription;
 import tink.Chunk;
 
 using tink.CoreApi;
@@ -9,7 +11,7 @@ using tink.CoreApi;
 /**
  * MQTT
  */
-class Mqtt implements why.pubsub.Adapter<String> {
+class Mqtt implements why.pubsub.Adapter<MqttMessage, MqttMessage, String> {
 	
 	var client:MqttClient;
 	
@@ -20,16 +22,19 @@ class Mqtt implements why.pubsub.Adapter<String> {
 		subscriptions = new Map();
 	}
 	
-	public function publish(topic:String, payload:Chunk):Promise<Noise> {
+	public function publish(message:MqttMessage):Promise<Noise> {
 		return
-			if(!MqttLib.isValidTopic(topic)) new Error('Invalid topic');
+			if(!MqttLib.isValidTopic(message.topic)) new Error('Invalid topic');
 			else(client.isConnected.value ? Promise.NOISE : client.connect())
-				.next(function(_) return publish(topic, payload));
+				.next(function(_) return publish(message));
 	}
 	
-	public function subscribe(pattern:String, handler:Callback<Outcome<Pair<String, Chunk>, Error>>):CallbackLink {
+	public function subscribe(pattern:String, handler:Callback<MqttMessage>):Subscription {
+		
+		var error = Future.trigger();
+		
 		if(!MqttLib.isValidPattern(pattern))
-			handler.invoke(Failure(new Error(BadRequest, 'Invalid topic filter')));
+			error.trigger(new Error(BadRequest, 'Invalid topic filter'));
 		
 		subscriptions[pattern] =
 			switch subscriptions[pattern] {
@@ -40,9 +45,10 @@ class Mqtt implements why.pubsub.Adapter<String> {
 					v + 1;
 			}
 		
-		return
-			client.message.handle(function(message) if(MqttLib.match(message.a, pattern)) handler.invoke(Success(message))) &
-			unsubscribe.bind(pattern);
+		return new SimpleSubscription(
+			client.message.handle(function(message) if(MqttLib.match(message.topic, pattern)) handler.invoke(message)) & unsubscribe.bind(pattern),
+			error
+		);
 	}
 	
 	function unsubscribe(pattern) {

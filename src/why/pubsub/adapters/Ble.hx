@@ -1,7 +1,8 @@
 package why.pubsub.adapters;
 
-import ble.*;
+import why.ble.*;
 import tink.Chunk;
+import tink.core.ext.Subscription;
 
 using Lambda;
 using tink.CoreApi;
@@ -22,16 +23,22 @@ class Ble implements why.pubsub.Adapter<Target> {
 			.next(function(characteristic) return characteristic.write(payload, target.withoutResponse));
 	}
 	
-	public function subscribe(target:Target, handler:Callback<Outcome<Pair<Target, Chunk>, Error>>):CallbackLink {
-		var link = getCharacteristic(target)
+	public function subscribe(target:Target, handler:Callback<Pair<Target, Chunk>>):Subscription {
+		var error = Future.trigger(); // TODO: handle error
+		var subscription:Subscription = null;
+		
+		getCharacteristic(target)
 			.handle(function(o) switch o {
 				case Success(characteristic):
-					characteristic.subscribe(function(o) handler.invoke(o.map(function(chunk) return new Pair(target, chunk))));
+					subscription = characteristic.subscribe(function(chunk) handler.invoke(new Pair(target, chunk)));
 				case Failure(e):
-					handler.invoke(Failure(e));
+					error.trigger(e);
 			});
 			
-		return function() link.dissolve();
+		return new SimpleSubscription(
+			function() subscription.cancel(),
+			subscription.error.first(error)
+		);
 	}
 	
 	function getCharacteristic(target:Target):Promise<Characteristic> {
