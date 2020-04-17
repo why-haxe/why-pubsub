@@ -1,0 +1,4 @@
+-D hxnodejs-amqp-connection-manager=1.0.0
+# @install: lix --silent download "gh://github.com/kevinresol/hxnodejs-amqp-connection-manager#51c2c53d95438ddc656166d4243a382242c2cf79" into hxnodejs-amqp-connection-manager/1.0.0/github/51c2c53d95438ddc656166d4243a382242c2cf79
+-lib hxnodejs-amqplib
+-cp ${HAXE_LIBCACHE}/hxnodejs-amqp-connection-manager/1.0.0/github/51c2c53d95438ddc656166d4243a382242c2cf79/src

@@ -1,0 +1,6 @@
+tests.hxml
+
+-lib travix
+-lib why-pubsub
+-js bin/completion.js
+--no-output
