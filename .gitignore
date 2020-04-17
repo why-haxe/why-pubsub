@@ -1,1 +1,3 @@
-bin
+bin/node/tests.js
+
+node_modules
