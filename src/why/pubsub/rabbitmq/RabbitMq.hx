@@ -5,7 +5,7 @@ import amqp.AmqpConnectionManager;
 using tink.CoreApi;
 
 @:genericBuild(why.pubsub.rabbitmq.RabbitMq.build())
-class RabbitMq<Pub, Sub> {}
+class RabbitMq<PubSub> {}
 
 class RabbitMqBase {
 	final manager:AmqpConnectionManager;

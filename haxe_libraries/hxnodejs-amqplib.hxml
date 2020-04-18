@@ -1,4 +1,4 @@
--D hxnodejs-amqplib=1.0.0
-# @install: lix --silent download "gh://github.com/kevinresol/hxnodejs-amqplib#d00a1d3ba245ba7622d0e035532122200ccd75aa" into hxnodejs-amqplib/1.0.0/github/d00a1d3ba245ba7622d0e035532122200ccd75aa
+# @install: lix --silent download "gh://github.com/kevinresol/hxnodejs-amqplib#602c6ef4dc31f7faa5f0fed5b815e722c74b027c" into hxnodejs-amqplib/1.0.0/github/602c6ef4dc31f7faa5f0fed5b815e722c74b027c
 -lib hxnodejs
--cp ${HAXE_LIBCACHE}/hxnodejs-amqplib/1.0.0/github/d00a1d3ba245ba7622d0e035532122200ccd75aa/src
+-cp ${HAXE_LIBCACHE}/hxnodejs-amqplib/1.0.0/github/602c6ef4dc31f7faa5f0fed5b815e722c74b027c/src
+-D hxnodejs-amqplib=1.0.0

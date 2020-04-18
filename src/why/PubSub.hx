@@ -1,7 +1,7 @@
 package why;
 
 interface PubSub<Pub, Sub> {
-	final pub:Pub;
-	final sub:Sub;
+	final publishers:Pub;
+	final subscribers:Sub;
 }
 

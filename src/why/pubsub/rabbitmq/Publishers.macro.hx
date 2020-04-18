@@ -22,25 +22,43 @@ class Publishers {
 			var def = macro class $name extends why.pubsub.rabbitmq.Publishers.PublishersBase implements $tp {}
 			
 			for(f in fields) {
-				var ct = f.type.toComplex();
-				var msgCt = f.messageType.toComplex();
-				var name = f.name;
-				var getter = 'get_$name';
-				var config = switch f.meta.extract(':why.pubsub.rabbitmq') {
-					case []: f.pos.error('Missing config via meta @:why.pubsub.rabbitmq');
-					case [{params: [expr]}]: macro ($expr:why.pubsub.rabbitmq.Publisher.PublisherConfig<$msgCt>);
-					case [{pos: pos}]: pos.error('@:why.pubsub.rabbitmq requires exactly one parameter');
-					case _: f.pos.error('Only one @:why.pubsub.rabbitmq is allowed');
+				var name = f.field.name;
+				var msgCt = f.type.toComplex();
+				
+				var config = switch f.field.meta.extract(':why.pubsub.rabbitmq') {
+					case []:
+						f.field.pos.error('Missing config via meta @:why.pubsub.rabbitmq');
+					case [{params: [expr]}]:
+						macro ($expr:why.pubsub.rabbitmq.Publisher.PublisherConfig<$msgCt>);
+					case [{pos: pos}]:
+						pos.error('@:why.pubsub.rabbitmq requires exactly one parameter');
+					case _:
+						f.field.pos.error('Only one @:why.pubsub.rabbitmq is allowed');
 				}
 				
-				def.fields = def.fields.concat((macro class {
-					public var $name(get, null):$ct;
-					function $getter():$ct {
-						if($i{name} == null)
-							$i{name} = new why.pubsub.rabbitmq.Publisher(manager, $config);
-						return $i{name};
-					}
-				}).fields);
+				switch f.variant {
+					case Prop:
+						var ct = f.field.type.toComplex();
+						var getter = 'get_$name';
+						def.fields = def.fields.concat((macro class {
+							public var $name(get, null):$ct;
+							function $getter():$ct {
+								if($i{name} == null)
+									$i{name} = new why.pubsub.rabbitmq.Publisher(manager, $config);
+								return $i{name};
+							}
+						}).fields);
+						
+					case Func(args):
+						var body = macro new why.pubsub.rabbitmq.Publisher(manager, $config);
+						var func = body.func(args.map(arg -> arg.name.toArg(arg.t.toComplex(), arg.opt)), macro:why.pubsub.Publisher<$msgCt>);
+						def.fields.push({
+							name: name,
+							access: [APublic],
+							kind: FFun(func),
+							pos: f.field.pos,
+						});
+				}
 			}
 			
 			def.pack = ['why', 'pubsub', 'rabbitmq'];
@@ -49,22 +67,6 @@ class Publishers {
 	}
 	
 	static function getFields(type:Type, pos:Position) {
-		return switch type {
-			case TInst(_.get() => {isInterface: true, fields: _.get() => fields}, _): 
-				[for(f in fields) switch f.type {
-					case TInst(_.get() => {pack: ['why', 'pubsub'], name: 'Publisher'}, [msg]):
-						{
-							name: f.name,
-							pos: f.pos,
-							meta: f.meta,
-							type: f.type,
-							messageType: msg,
-						}
-					case v:
-						f.pos.error('Only why.pubsub.Publisher<T> is supported here but got (${v.getID()})');
-				}];
-			case _:
-				pos.error('Expected interface');
-		}
+		return Helper.getFields(type, 'Publisher', pos);
 	} 
 }
