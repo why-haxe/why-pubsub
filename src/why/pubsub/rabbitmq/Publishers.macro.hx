@@ -43,7 +43,7 @@ class Publishers {
 					case Func(args):
 						var ct = macro:why.pubsub.Publisher<$msgCt>;
 						
-						var body = switch Helper.getCache(f.field, args) {
+						var body = switch Helper.getCache(f.field) {
 							case Some(cache):
 								var cacheName = '__cache_$name';
 								def.fields.push({
@@ -53,9 +53,9 @@ class Publishers {
 									pos: f.field.pos,
 								});
 								
-								var callArgs = args.map(arg -> macro $i{arg.name});
 								macro {
-									var key = $cache.getKey($a{callArgs});
+									var cache = $cache;
+									var key = cache.key;
 									$i{cacheName}.get(key, _ -> new why.pubsub.rabbitmq.Publisher(manager, $config));
 								}
 							case None:

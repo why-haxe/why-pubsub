@@ -109,11 +109,11 @@ interface Publishers {
 	var foo(get, never):Publisher<{foo:Int, bar:String}>;
 	
 	@:why.pubsub.rabbitmq({exchange: 'variant', routingKey: 'variant.$id', serialize: v -> haxe.Serializer.run(v)})
-	@:why.pubsub.cache({getKey: id -> id})
+	@:why.pubsub.cache({key: id})
 	function variant(id:String):Publisher<{foo:Int, bar:String}>;
 	
 	@:why.pubsub.rabbitmq({exchange: 'cache', routingKey: 'cache.$id', serialize: v -> haxe.Serializer.run(v)})
-	@:why.pubsub.cache({getKey: (id, foo, bar) -> id + foo + bar})
+	@:why.pubsub.cache({key: id + foo + bar})
 	function cache(id:String, foo:Int, bar:Bool):Publisher<{foo:Int, bar:String}>;
 	
 }
@@ -123,10 +123,10 @@ interface Subscribers {
 	var bar(get, never):Subscriber<{foo:Int, bar:String}>;
 	
 	@:why.pubsub.rabbitmq({queue: 'variant_$id', prefetch: 2, unserialize: v -> tink.core.Error.catchExceptions(haxe.Unserializer.run.bind(v))})
-	@:why.pubsub.cache({getKey: id -> id})
+	@:why.pubsub.cache({key: id})
 	function variant(id:String):Subscriber<{foo:Int, bar:String}>;
 	
 	@:why.pubsub.rabbitmq({queue: 'cache_$id', prefetch: 2, unserialize: v -> tink.core.Error.catchExceptions(haxe.Unserializer.run.bind(v))})
-	@:why.pubsub.cache({getKey: (id, foo, bar) -> id + foo + bar})
+	@:why.pubsub.cache({key: id + foo + bar})
 	function cache(id:String, foo:Int, bar:Bool):Subscriber<{foo:Int, bar:String}>;
 }

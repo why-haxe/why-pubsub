@@ -51,13 +51,12 @@ class Helper {
 		}
 	}
 	
-	public static function getCache(field:ClassField, args:Array<{name:String, opt:Bool, t:Type}>):Option<Expr> {
+	public static function getCache(field:ClassField):Option<Expr> {
 		return switch field.meta.extract(':why.pubsub.cache') {
 			case []:
 				None;
 			case [{params: [expr]}]:
-				var ct = ComplexType.TFunction(args.map(arg -> arg.t.toComplex()), macro:String);
-				Some(macro ($expr:why.pubsub.Cache.CacheConfig<$ct>));
+				Some(macro ($expr:why.pubsub.Cache.CacheConfig<String>));
 			case [{pos: pos}]:
 				pos.error('@:why.pubsub.cache requires exactly one parameter');
 			case _:

@@ -4,8 +4,8 @@ interface Cache<K, V> {
 	function get(k:K, factory:K->V):V;
 }
 
-typedef CacheConfig<F> = {
-	final getKey:F;
+typedef CacheConfig<K> = {
+	final key:K;
 }
 
 class StringCache<V> implements Cache<String, V> {
