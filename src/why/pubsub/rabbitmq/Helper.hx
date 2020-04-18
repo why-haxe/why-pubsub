@@ -1,5 +1,6 @@
 package why.pubsub.rabbitmq;
 
+import haxe.ds.Option;
 import haxe.macro.Expr;
 import haxe.macro.Type;
 
@@ -36,6 +37,33 @@ class Helper {
 				pos.error('Expected interface');
 		}
 	} 
+	
+	public static function getConfig(field:ClassField):Expr {
+		return switch field.meta.extract(':why.pubsub.rabbitmq') {
+			case []:
+				field.pos.error('Missing config via meta @:why.pubsub.rabbitmq');
+			case [{params: [expr]}]:
+				expr;
+			case [{pos: pos}]:
+				pos.error('@:why.pubsub.rabbitmq requires exactly one parameter');
+			case _:
+				field.pos.error('Only one @:why.pubsub.rabbitmq is allowed');
+		}
+	}
+	
+	public static function getCache(field:ClassField, args:Array<{name:String, opt:Bool, t:Type}>):Option<Expr> {
+		return switch field.meta.extract(':why.pubsub.cache') {
+			case []:
+				None;
+			case [{params: [expr]}]:
+				var ct = ComplexType.TFunction(args.map(arg -> arg.t.toComplex()), macro:String);
+				Some(macro ($expr:why.pubsub.Cache.CacheConfig<$ct>));
+			case [{pos: pos}]:
+				pos.error('@:why.pubsub.cache requires exactly one parameter');
+			case _:
+				field.pos.error('Only one @:why.pubsub.cache is allowed');
+		}
+	}
 }
 
 typedef Entry = {

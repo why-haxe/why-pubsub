@@ -25,16 +25,7 @@ class Publishers {
 				var name = f.field.name;
 				var msgCt = f.type.toComplex();
 				
-				var config = switch f.field.meta.extract(':why.pubsub.rabbitmq') {
-					case []:
-						f.field.pos.error('Missing config via meta @:why.pubsub.rabbitmq');
-					case [{params: [expr]}]:
-						macro ($expr:why.pubsub.rabbitmq.Publisher.PublisherConfig<$msgCt>);
-					case [{pos: pos}]:
-						pos.error('@:why.pubsub.rabbitmq requires exactly one parameter');
-					case _:
-						f.field.pos.error('Only one @:why.pubsub.rabbitmq is allowed');
-				}
+				var config = macro (${Helper.getConfig(f.field)}:why.pubsub.rabbitmq.Publisher.PublisherConfig<$msgCt>);
 				
 				switch f.variant {
 					case Prop:
@@ -50,8 +41,27 @@ class Publishers {
 						}).fields);
 						
 					case Func(args):
-						var body = macro new why.pubsub.rabbitmq.Publisher(manager, $config);
-						var func = body.func(args.map(arg -> arg.name.toArg(arg.t.toComplex(), arg.opt)), macro:why.pubsub.Publisher<$msgCt>);
+						var ct = macro:why.pubsub.Publisher<$msgCt>;
+						
+						var body = switch Helper.getCache(f.field, args) {
+							case Some(cache):
+								var cacheName = '__cache_$name';
+								def.fields.push({
+									name: cacheName,
+									access: [],
+									kind: FVar(macro:why.pubsub.Cache<String, $ct>, macro new why.pubsub.Cache.StringCache()),
+									pos: f.field.pos,
+								});
+								
+								var callArgs = args.map(arg -> macro $i{arg.name});
+								macro {
+									var key = $cache.getKey($a{callArgs});
+									$i{cacheName}.get(key, _ -> new why.pubsub.rabbitmq.Publisher(manager, $config));
+								}
+							case None:
+								macro new why.pubsub.rabbitmq.Publisher(manager, $config);
+						}
+						var func = body.func(args.map(arg -> arg.name.toArg(arg.t.toComplex(), arg.opt)), ct);
 						def.fields.push({
 							name: name,
 							access: [APublic],
