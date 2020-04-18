@@ -9,7 +9,6 @@ using tink.CoreApi;
 class RabbitMqTest {
 	public function new() {}
 	
-	@:include
 	public function cache() {
 		var manager = amqp.AmqpConnectionManager.connect(['amqp://localhost']);
 		var rabbitmq = new why.pubsub.rabbitmq.RabbitMq<PubSub>(manager);
