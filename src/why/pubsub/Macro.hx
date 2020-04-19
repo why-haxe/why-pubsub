@@ -52,9 +52,9 @@ class Macro {
 	}
 	
 	public static function getConfig(field:ClassField):Expr {
-		return switch Macro.getMetaWithOneParam(field, ':why.pubsub') {
+		return switch Macro.getMetaWithOneParam(field, ':pubsub') {
 			case None:
-				field.pos.error('Missing config via meta @:why.pubsub');
+				field.pos.error('Missing config via meta @:pubsub');
 			case Some(expr):
 				expr;
 		}
@@ -82,7 +82,7 @@ class Macro {
 				case Func(args):
 					var ct = macro:why.pubsub.$kind<$msgCt>;
 					
-					var body = switch getMetaWithOneParam(f.field, ':why.pubsub.cache') {
+					var body = switch getMetaWithOneParam(f.field, ':pubsub.cache') {
 						case Some(cache):
 							var cacheName = '__cache_$name';
 							def.fields.push({

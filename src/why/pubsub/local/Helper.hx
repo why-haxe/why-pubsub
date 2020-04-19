@@ -7,9 +7,9 @@ using tink.MacroApi;
 
 class Helper {
 	public static function getConfig(field:ClassField):Expr {
-		return switch Macro.getMetaWithOneParam(field, ':why.pubsub.local') {
+		return switch Macro.getMetaWithOneParam(field, ':pubsub.local') {
 			case None:
-				field.pos.error('Missing config via meta @:why.pubsub.local');
+				field.pos.error('Missing config via meta @:pubsub.local');
 			case Some(expr):
 				expr;
 		}

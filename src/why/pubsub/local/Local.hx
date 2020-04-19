@@ -84,9 +84,9 @@ typedef LocalConfig = {
 }
 
 Pub:
-@:why.pubsub.local({name: ''})
+@:pubsub.local({name: ''})
 
 Sub:
-@:why.pubsub.local({name: ''})
+@:pubsub.local({name: ''})
 
 */
