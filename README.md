@@ -31,6 +31,7 @@ Example:
 
 ```haxe
 var amqp = new why.pubsub.amqp.Amqp<MyPubSub>(...);
+var pubsub:MyPubSub = amqp; // ok, the instance will implement the specified interface
 
 typedef MyPubSub = why.PubSub<Publishers, Subscribers>;
 
