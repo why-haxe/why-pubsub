@@ -18,8 +18,8 @@ class Local {
 						public final publishers:$pubCt;
 						public final subscribers:$subCt;
 						
-						public function new() {
-							super();
+						public function new(pollInterval = 100) {
+							super(pollInterval);
 							publishers = new why.pubsub.local.Publishers<$pubCt>(this);
 							subscribers = new why.pubsub.local.Subscribers<$subCt>(this);
 						}

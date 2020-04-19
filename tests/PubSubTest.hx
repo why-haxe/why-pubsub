@@ -21,37 +21,17 @@ class PubSubTest {
 		switch Std.downcast(pubsub, Rabbit) {
 			case null:
 			case rabbitmq:
-				return rabbitmq
-					.sync({
-						exchanges: [
-							{name: 'foo', type: 'fanout'},
-							{name: 'variant', type: 'direct'},
-						],
-						queues: [
-							{name: 'bar', bindings: [{exchange: 'foo', pattern: ''}]},
-							{name: 'variant_1', bindings: [{exchange: 'variant', pattern: 'variant.1'}]},
-							{name: 'variant_2', bindings: [{exchange: 'variant', pattern: 'variant.2'}]},
-						],
-					});
-		}
-		
-		switch Std.downcast(pubsub, Local) {
-			case null:
-			case local:
-				return local
-					.sync(
-						{
-							publishers: [
-								{name: 'foo'},
-								{name: 'variant_1'},
-								{name: 'variant_2'},
-							],
-							subscribers: [
-								{name: 'foo', publisher: 'foo'},
-								{name: 'variant_1', publisher: 'variant_1'},
-								{name: 'variant_2', publisher: 'variant_2'},
-							],
-						});
+				return rabbitmq.sync({
+					exchanges: [
+						{name: 'foo', type: 'fanout'},
+						{name: 'variant', type: 'direct'},
+					],
+					queues: [
+						{name: 'bar', bindings: [{exchange: 'foo', pattern: ''}]},
+						{name: 'variant_1', bindings: [{exchange: 'variant', pattern: 'variant.1'}]},
+						{name: 'variant_2', bindings: [{exchange: 'variant', pattern: 'variant.2'}]},
+					],
+				});
 		}
 		
 		return Promise.NOISE;
@@ -91,7 +71,7 @@ class PubSubTest {
 						envelope.ack();
 						reject(e);
 				});
-			}),
+			}, true),
 			new Promise(function(resolve, reject) {
 				pubsub.publishers.variant('1').publish({foo: 2, bar: 'b'}).eager();
 				
@@ -105,7 +85,7 @@ class PubSubTest {
 						envelope.ack();
 						reject(e);
 				});
-			}),
+			}, true),
 			new Promise(function(resolve, reject) {
 				pubsub.publishers.variant('2').publish({foo: 3, bar: 'c'}).eager();
 				
@@ -119,9 +99,9 @@ class PubSubTest {
 						envelope.ack();
 						reject(e);
 				});
-			}),
+			}, true),
 		])
-			.flatMap(_ -> Future.delay(500, Success(Noise))) // give time to ack
+			.flatMap(_ -> Future.delay(200, Success(Noise))) // give time to ack
 			.handle(asserts.handle);
 		
 		return asserts;
