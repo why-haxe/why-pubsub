@@ -6,7 +6,16 @@ import tink.unit.*;
 class RunTests {
 
 	static function main() {
-		Runner.run(TestBatch.make([new RabbitMqTest()])).handle(Runner.exit);
+		var local = new why.pubsub.local.Local<PubSub>();
+		
+		var manager = amqp.AmqpConnectionManager.connect(['amqp://localhost']);
+		var rabbitmq = new why.pubsub.rabbitmq.RabbitMq<PubSub>(manager);
+		
+		
+		Runner.run(TestBatch.make([
+			new PubSubTest(local),
+			new PubSubTest(rabbitmq),
+		])).handle(Runner.exit);
 	}
 }
 
