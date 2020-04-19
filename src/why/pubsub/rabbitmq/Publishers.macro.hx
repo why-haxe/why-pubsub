@@ -20,7 +20,7 @@ class Publishers {
 			var fields = Macro.getFields(ctx.type, Publisher, ctx.pos);
 			Macro.populate(def, fields, Publisher, f -> {
 				var msgCt = f.type.toComplex();
-				var config = macro (${Helper.getConfig(f.field)}:why.pubsub.rabbitmq.Publisher.PublisherConfig<$msgCt>);
+				var config = macro (tink.Anon.merge(${Helper.getConfig(f.field)}, ${Macro.getConfig(f.field)}):why.pubsub.rabbitmq.Publisher.PublisherConfig<$msgCt>);
 				macro new why.pubsub.rabbitmq.Publisher(manager, $config);
 			});
 			

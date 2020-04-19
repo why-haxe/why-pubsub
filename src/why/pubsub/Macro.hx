@@ -51,6 +51,15 @@ class Macro {
 		}
 	}
 	
+	public static function getConfig(field:ClassField):Expr {
+		return switch Macro.getMetaWithOneParam(field, ':why.pubsub') {
+			case None:
+				field.pos.error('Missing config via meta @:why.pubsub');
+			case Some(expr):
+				expr;
+		}
+	}
+	
 	public static function populate(def:TypeDefinition, fields:Array<Entry>, kind:PubSubKind, getFactory:Entry->Expr) {
 		for(f in fields) {
 			var name = f.field.name;

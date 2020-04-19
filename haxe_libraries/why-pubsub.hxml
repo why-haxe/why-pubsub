@@ -2,5 +2,5 @@
 -D why-pubsub
 
 -lib tink_chunk
--lib tink_json
+-lib tink_anon
 -lib tink_core_ext

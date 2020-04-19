@@ -21,7 +21,7 @@ class Subscribers {
 			var fields = Macro.getFields(ctx.type, Subscriber, ctx.pos);
 			Macro.populate(def, fields, Subscriber, f -> {
 				var msgCt = f.type.toComplex();
-				var config = macro (${Helper.getConfig(f.field)}:why.pubsub.local.Subscriber.SubscriberConfig<$msgCt>);
+				var config = macro (tink.Anon.merge(${Helper.getConfig(f.field)}, ${Macro.getConfig(f.field)}):why.pubsub.local.Subscriber.SubscriberConfig<$msgCt>);
 				macro new why.pubsub.local.Subscriber(local, $config);
 			});
 			

@@ -12,7 +12,7 @@
   "version": "0.0.0",
   "dependencies": {
     "tink_core_ext": "",
-    "tink_chunk": "",
-    "tink_json": ""
+    "tink_anon": "",
+    "tink_chunk": ""
   }
 }
