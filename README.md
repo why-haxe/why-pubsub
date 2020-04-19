@@ -25,7 +25,9 @@ interface Envelope<Message> {
 ## Usage
 
 Define two interfaces containing all the publishers and subscribers needed. 
-Then, pick an implementation class and use the interfaces as type parameters, wrapped by `why.PubSub`
+Then, pick an implementation class and use the interfaces as type parameters, wrapped by `why.PubSub`.
+
+Example:
 
 ```haxe
 var amqp = new why.pubsub.amqp.Amqp<MyPubSub>(...);
@@ -59,11 +61,11 @@ interface Subscribers {
 
 ## Implementations
 
-#### `why.amqp.Amqp`
+#### `why.pubsub.amqp.Amqp`
 
 Node.js only. Based on the npm package `amqplib` for the AMQP 0-9-1 protocol. Compatible to RabbitMQ.
 
-#### `why.local.Local`
+#### `why.pubsub.local.Local`
 
 A simple in-memory message queue. Mainly for local testing.
 
@@ -102,7 +104,7 @@ Only applicable to functions. If not specified, every time the function gets cal
 
 ```haxe
 {
-	// queue name
+	// publish messages to this queue name
 	final name:String;
 }
 ```
@@ -111,7 +113,7 @@ Only applicable to functions. If not specified, every time the function gets cal
 
 ```haxe
 {
-	// queue name
+	// subscribe to messages in this queue name
 	final name:String;
 }
 ```
@@ -120,10 +122,10 @@ Only applicable to functions. If not specified, every time the function gets cal
 
 ```haxe
 {
-	// name of the exchange to publish a message
+	// publish messages to this exchange
 	final exchange:String;
 	
-	// routing key to publish a message
+	// publish messages with this routing key
 	final routingKey:String;
 }
 ```
@@ -132,7 +134,7 @@ Only applicable to functions. If not specified, every time the function gets cal
 
 ```haxe
 {
-	// name of the queue to publish a message
+	// subscribe to messages in this queue
 	final queue:String;
 	
 	// max "in-flight" messages for this subscription (see amqp doc for more info)
@@ -142,5 +144,5 @@ Only applicable to functions. If not specified, every time the function gets cal
 
 ## TODO
 
-- [] GCP PubSub
-- [] AWS SQS
+- [ ] GCP PubSub
+- [ ] AWS SQS
