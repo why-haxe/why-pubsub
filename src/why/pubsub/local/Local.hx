@@ -23,9 +23,11 @@ class LocalBase {
 		if(!messages.exists(name)) messages[name] = [];
 	}
 	
-	public function publish(name:String, message:Chunk):Promise<Noise> {
-		ensure(name);
-		messages[name].push(message);
+	public function publish(names:Names, message:Chunk):Promise<Noise> {
+		for(name in names) {
+			ensure(name);
+			messages[name].push(message);
+		}
 		return Promise.NOISE;
 	}
 	

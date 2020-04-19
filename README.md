@@ -107,8 +107,8 @@ Only applicable to functions. If not specified, every time the function gets cal
 
 ```haxe
 {
-	// publish messages to this queue name
-	final name:String;
+	// publish messages to the specified queue name(s)
+	final to:EitherType<String, Array<String>>;
 }
 ```
 
@@ -116,8 +116,8 @@ Only applicable to functions. If not specified, every time the function gets cal
 
 ```haxe
 {
-	// subscribe to messages in this queue name
-	final name:String;
+	// subscribe to messages in the specified queue name
+	final to:String;
 }
 ```
 

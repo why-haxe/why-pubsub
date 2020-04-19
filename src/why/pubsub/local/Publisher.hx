@@ -16,11 +16,11 @@ class Publisher<Message> implements why.pubsub.Publisher<Message> {
 	}
 		
 	public function publish(message:Message):Promise<Noise> {
-		return local.publish(config.name, config.serialize(message));
+		return local.publish(config.to, config.serialize(message));
 	}
 }
 
 typedef PublisherConfig<Message> = {
-	final name:String;
+	final to:Names;
 	final serialize:Message->Chunk;
 }

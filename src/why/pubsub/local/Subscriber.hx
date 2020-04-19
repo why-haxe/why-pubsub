@@ -18,7 +18,7 @@ class Subscriber<Message> implements why.pubsub.Subscriber<Message> {
 	}
 		
 	public function subscribe(handler:Handler<Message>):Subscription {
-		var binding = local.subscribe(config.name, function(chunk, retry) {
+		var binding = local.subscribe(config.to, function(chunk, retry) {
 			handler(new Envelope(config.unserialize(chunk), retry));
 		});
 		
@@ -27,7 +27,7 @@ class Subscriber<Message> implements why.pubsub.Subscriber<Message> {
 }
 
 typedef SubscriberConfig<Message> = {
-	final name:String;
+	final to:String;
 	final unserialize:Chunk->Outcome<Message, Error>;
 }
 
