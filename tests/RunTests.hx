@@ -9,12 +9,11 @@ class RunTests {
 		var local = new why.pubsub.local.Local<PubSub>(20);
 		
 		var manager = amqp.AmqpConnectionManager.connect(['amqp://localhost']);
-		var rabbitmq = new why.pubsub.rabbitmq.RabbitMq<PubSub>(manager);
-		
+		var amqp = new why.pubsub.amqp.Amqp<PubSub>(manager);
 		
 		Runner.run(TestBatch.make([
 			new PubSubTest(local),
-			new PubSubTest(rabbitmq),
+			new PubSubTest(amqp),
 		])).handle(Runner.exit);
 	}
 }

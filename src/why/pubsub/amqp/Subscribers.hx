@@ -1,11 +1,11 @@
-package why.pubsub.rabbitmq;
+package why.pubsub.amqp;
 
 import amqp.AmqpConnectionManager;
 
-@:genericBuild(why.pubsub.rabbitmq.Publishers.build())
-class Publishers<T> {}
+@:genericBuild(why.pubsub.amqp.Subscribers.build())
+class Subscribers<T> {}
 
-class PublishersBase {
+class SubscribersBase {
 	final manager:AmqpConnectionManager;
 	
 	public function new(manager) {

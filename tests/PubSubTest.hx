@@ -5,7 +5,7 @@ import why.pubsub.*;
 
 using tink.CoreApi;
 
-typedef Rabbit = why.pubsub.rabbitmq.RabbitMq<PubSub>;
+typedef Rabbit = why.pubsub.amqp.Amqp<PubSub>;
 typedef Local = why.pubsub.local.Local<PubSub>;
 
 @:asserts
@@ -20,8 +20,8 @@ class PubSubTest {
 	public function setup() {
 		switch Std.downcast(pubsub, Rabbit) {
 			case null:
-			case rabbitmq:
-				return rabbitmq.sync({
+			case amqp:
+				return amqp.sync({
 					exchanges: [
 						{name: 'foo', type: 'fanout'},
 						{name: 'variant', type: 'direct'},

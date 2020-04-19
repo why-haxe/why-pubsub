@@ -1,20 +1,20 @@
-package why.pubsub.rabbitmq;
+package why.pubsub.amqp;
 
 import amqp.AmqpConnectionManager;
 
 using tink.CoreApi;
 
-@:genericBuild(why.pubsub.rabbitmq.RabbitMq.build())
-class RabbitMq<PubSub> {}
+@:genericBuild(why.pubsub.amqp.Amqp.build())
+class Amqp<PubSub> {}
 
-class RabbitMqBase {
+class AmqpBase {
 	final manager:AmqpConnectionManager;
 	
 	public function new(manager) {
 		this.manager = manager;
 	}
 	
-	public function sync(config:RabbitMqConfig):Promise<Noise> {
+	public function sync(config:AmqpConfig):Promise<Noise> {
 		// TODO: remove existing bindings that are not specified in config
 		return Future.async(function(cb) {
 			var wrapped;
@@ -38,7 +38,7 @@ class RabbitMqBase {
 	}
 }
 
-typedef RabbitMqConfig = {
+typedef AmqpConfig = {
 	final exchanges:Array<ExchangeConfig>;
 	final queues:Array<QueueConfig>;
 }

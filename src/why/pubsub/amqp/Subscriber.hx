@@ -1,4 +1,4 @@
-package why.pubsub.rabbitmq;
+package why.pubsub.amqp;
 
 import tink.core.ext.Subscription;
 import amqp.AmqpConfirmChannel;
