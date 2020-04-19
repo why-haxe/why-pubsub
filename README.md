@@ -66,6 +66,8 @@ interface Subscribers {
 
 Node.js only. Based on the npm package `amqplib` for the AMQP 0-9-1 protocol. Compatible to RabbitMQ.
 
+Use the `.sync({...})` function to set up the exchanges and queues in the broker.
+
 #### `why.pubsub.local.Local`
 
 A simple in-memory message queue. Mainly for local testing.
