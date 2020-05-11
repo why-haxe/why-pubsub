@@ -14,6 +14,9 @@ class Publisher<Message> implements why.pubsub.Publisher<Message> {
 		this.channel = manager.createChannel({
 			setup: channel -> js.lib.Promise.resolve(),
 		});
+		#if why_pubsub_debug
+		this.channel.on('error', cast js.Node.console.log);
+		#end
 		this.config = config;
 	}
 		
