@@ -32,7 +32,7 @@ class Subscriber<Message> implements why.pubsub.Subscriber<Message> {
 		});
 		
 		var error = new Signal(cb -> {
-			wrapper.on('error', function onError(e) cb.invoke(Error.ofJsError(e)));
+			wrapper.on('error', function onError(e) cb(Error.ofJsError(e)));
 			wrapper.removeListener.bind('error', onError);
 		});
 		
