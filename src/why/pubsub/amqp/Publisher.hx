@@ -22,12 +22,21 @@ class Publisher<Message> implements why.pubsub.Publisher<Message> {
 		
 	public function publish(message:Message):Promise<Noise> {
 		var buffer = config.serialize(message).toBuffer();
-		return Promise.ofJsPromise(channel.publish(config.exchange, config.routingKey, buffer)).noise();
+		var routingKey = config.routingKey(message);
+		return Promise.ofJsPromise(channel.publish(config.exchange, routingKey, buffer)).noise();
 	}
 }
 
 typedef PublisherConfig<Message> = {
 	final exchange:String;
-	final routingKey:String;
+	final routingKey:RoutingKey<Message>;
 	final serialize:Message->Chunk;
+}
+
+@:callable
+abstract RoutingKey<Message>(Message->String) from Message->String to Message->String {
+	@:from
+	public static inline function ofString<Message>(v:String):RoutingKey<Message> {
+		return _ -> v;
+	}
 }
