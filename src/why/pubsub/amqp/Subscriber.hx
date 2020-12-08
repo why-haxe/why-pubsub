@@ -24,7 +24,7 @@ class Subscriber<Message> implements why.pubsub.Subscriber<Message> {
 			setup: channel -> {
 				channel.prefetch(config.prefetch);
 				channel.consume(config.queue, function(msg) {
-					var envelope:why.pubsub.Envelope<Message> = new Envelope(channel, msg, config.unserialize(msg.content));
+					var envelope:why.pubsub.Envelope<Message> = new Envelope(channel, msg, msg.content, config.unserialize(msg.content));
 					handler(envelope);
 				});
 				js.lib.Promise.resolve();
@@ -49,15 +49,17 @@ typedef SubscriberConfig<Message> = {
 
 class Envelope<Message> implements why.pubsub.Envelope<Message> {
 	public final id:String;
+	public final raw:Chunk;
 	public final content:Outcome<Message, Error>;
 	
 	final native:AmqpMsg;
 	final channel:AmqpConfirmChannel;
 	
-	public function new(channel, native, content) {
+	public function new(channel, native, raw, content) {
 		this.channel = channel;
 		this.native = native;
 		this.id = native.properties == null ? null : native.properties.messageId;
+		this.raw = raw;
 		this.content = content;
 	}
 	

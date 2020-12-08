@@ -19,7 +19,7 @@ class Subscriber<Message> implements why.pubsub.Subscriber<Message> {
 		
 	public function subscribe(handler:Handler<Message>):Subscription {
 		var binding = local.subscribe(config.to, function(chunk, retry) {
-			handler(new Envelope(config.unserialize(chunk), retry));
+			handler(new Envelope(chunk, config.unserialize(chunk), retry));
 		});
 		
 		return new SimpleSubscription(binding, Signal.trigger());
@@ -33,11 +33,13 @@ typedef SubscriberConfig<Message> = {
 
 class Envelope<Message> implements why.pubsub.Envelope<Message> {
 	public final id:String = null;
+	public final raw:Chunk;
 	public final content:Outcome<Message, Error>;
 	
 	final retry:()->Void;
 	
-	public function new(content, retry) {
+	public function new(raw, content, retry) {
+		this.raw = raw;
 		this.content = content;
 		this.retry = retry;
 	}
