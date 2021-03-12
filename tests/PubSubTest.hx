@@ -61,7 +61,7 @@ class PubSubTest {
 			new Promise(function(resolve, reject) {
 				pubsub.publishers.foo.publish({foo: 1, bar: 'a'}).eager();
 				
-				var subscription = pubsub.subscribers.bar.subscribe(envelope -> switch envelope.content {
+				var subscription = pubsub.subscribers.bar.subscribe(envelope -> switch envelope.content.get() {
 					case Success(message):
 						envelope.ack();
 						asserts.assert(message.foo == 1);
@@ -75,7 +75,7 @@ class PubSubTest {
 			new Promise(function(resolve, reject) {
 				pubsub.publishers.variant('1').publish({foo: 2, bar: 'b'}).eager();
 				
-				var subscription = pubsub.subscribers.variant('1').subscribe(envelope -> switch envelope.content {
+				var subscription = pubsub.subscribers.variant('1').subscribe(envelope -> switch envelope.content.get() {
 					case Success(message):
 						envelope.ack();
 						asserts.assert(message.foo == 2);
@@ -89,7 +89,7 @@ class PubSubTest {
 			new Promise(function(resolve, reject) {
 				pubsub.publishers.variant('2').publish({foo: 3, bar: 'c'}).eager();
 				
-				var subscription = pubsub.subscribers.variant('2').subscribe(envelope -> switch envelope.content {
+				var subscription = pubsub.subscribers.variant('2').subscribe(envelope -> switch envelope.content.get() {
 					case Success(message):
 						envelope.ack();
 						asserts.assert(message.foo == 3);
