@@ -7,6 +7,7 @@ using tink.CoreApi;
 
 typedef Rabbit = why.pubsub.amqp.Amqp<PubSub>;
 typedef Local = why.pubsub.local.Local<PubSub>;
+typedef Mqtt = why.pubsub.mqtt.Mqtt<PubSub>;
 
 @:asserts
 class PubSubTest {
@@ -34,6 +35,12 @@ class PubSubTest {
 				});
 		}
 		
+		switch Std.downcast(pubsub, Mqtt) {
+			case null:
+			case mqtt:
+				return mqtt.client.connect();
+		}
+		
 		return Promise.NOISE;
 	}
 	
@@ -59,7 +66,6 @@ class PubSubTest {
 	public function test() {
 		Promise.inSequence([
 			new Promise(function(resolve, reject) {
-				pubsub.publishers.foo.publish({foo: 1, bar: 'a'}).eager();
 				
 				var subscription = pubsub.subscribers.bar.subscribe(envelope -> switch envelope.content.get() {
 					case Success(message):
@@ -71,9 +77,9 @@ class PubSubTest {
 						envelope.ack();
 						reject(e);
 				});
+				pubsub.publishers.foo.publish({foo: 1, bar: 'a'}).eager();
 			}, true),
 			new Promise(function(resolve, reject) {
-				pubsub.publishers.variant('1').publish({foo: 2, bar: 'b'}).eager();
 				
 				var subscription = pubsub.subscribers.variant('1').subscribe(envelope -> switch envelope.content.get() {
 					case Success(message):
@@ -85,9 +91,9 @@ class PubSubTest {
 						envelope.ack();
 						reject(e);
 				});
+				pubsub.publishers.variant('1').publish({foo: 2, bar: 'b'}).eager();
 			}, true),
 			new Promise(function(resolve, reject) {
-				pubsub.publishers.variant('2').publish({foo: 3, bar: 'c'}).eager();
 				
 				var subscription = pubsub.subscribers.variant('2').subscribe(envelope -> switch envelope.content.get() {
 					case Success(message):
@@ -99,6 +105,7 @@ class PubSubTest {
 						envelope.ack();
 						reject(e);
 				});
+				pubsub.publishers.variant('2').publish({foo: 3, bar: 'c'}).eager();
 			}, true),
 		])
 			.flatMap(_ -> Future.delay(200, Success(Noise))) // give time to ack

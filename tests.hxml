@@ -4,5 +4,6 @@
 
 -lib tink_unittest
 -lib hxnodejs-amqp-connection-manager
+-lib why-mqtt
 
 -D analyzer-optimize

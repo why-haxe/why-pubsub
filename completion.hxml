@@ -2,5 +2,6 @@ tests.hxml
 
 -lib travix
 -lib why-pubsub
+-lib why-mqtt
 -js bin/completion.js
 --no-output
