@@ -3,6 +3,7 @@ package why.pubsub.mqtt;
 import tink.core.ext.Subscription;
 import tink.Chunk;
 import why.pubsub.Subscriber.Handler;
+import why.mqtt.Qos;
 
 using tink.CoreApi;
 
@@ -20,7 +21,7 @@ class Subscriber<Message> implements why.pubsub.Subscriber<Message> {
 		final errors = Signal.trigger();
 		
 		var binding1:CallbackLink = null;
-		binding1 = client.subscribe(config.topic, config.options).handle(o -> switch o {
+		binding1 = client.subscribe(config.topic, config).handle(o -> switch o {
 			case Success(sub): binding1 = sub;
 			case Failure(e): errors.trigger(e);
 		});
@@ -39,7 +40,7 @@ class Subscriber<Message> implements why.pubsub.Subscriber<Message> {
 
 typedef SubscriberConfig<Message> = {
 	final topic:why.mqtt.Topic;
-	final ?options:why.mqtt.Client.SubscribeOptions;
+	final ?qos:Qos;
 	final unserialize:Chunk->Outcome<Message, Error>;
 }
 

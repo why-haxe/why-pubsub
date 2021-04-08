@@ -1,3 +1,3 @@
-# @install: lix --silent download "gh://github.com/why-haxe/why-mqtt#84cbd7b840b837db859b7ce3db2e236d6caceeea" into why-mqtt/0.0.0/github/84cbd7b840b837db859b7ce3db2e236d6caceeea
--cp ${HAXE_LIBCACHE}/why-mqtt/0.0.0/github/84cbd7b840b837db859b7ce3db2e236d6caceeea/src
+# @install: lix --silent download "gh://github.com/why-haxe/why-mqtt#5a5f6bcee7566bcadbc3c277768bec157a18ed0b" into why-mqtt/0.0.0/github/5a5f6bcee7566bcadbc3c277768bec157a18ed0b
+-cp ${HAXE_LIBCACHE}/why-mqtt/0.0.0/github/5a5f6bcee7566bcadbc3c277768bec157a18ed0b/src
 -D why-mqtt=0.0.0
