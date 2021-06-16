@@ -14,16 +14,16 @@ class Macro {
 				[for(f in fields) {
 					if(!f.meta.has(':compilerGenerated')) {
 						switch [f.kind, f.type] {
-							case [FVar(AccCall, AccNever | AccNo), TInst(_.get() => {pack: ['why', 'pubsub'], name: name}, [msg])] if ((kind:String) == name):
+							case [FVar(AccCall, AccNever | AccNo), TInst(_.get() => {pack: ['why', 'pubsub'], name: name}, types)] if ((kind:String) == name):
 								{
 									field: f,
-									type: msg,
+									types: types,
 									variant: Prop,
 								}
-							case [FMethod(_), TFun(args, TInst(_.get() => {pack: ['why', 'pubsub'], name: name}, [msg]))] if ((kind:String) == name):
+							case [FMethod(_), TFun(args, TInst(_.get() => {pack: ['why', 'pubsub'], name: name}, types))] if ((kind:String) == name):
 								{
 									field: f,
-									type: msg,
+									types: types,
 									variant: Func(args),
 								}
 							case [FVar(AccCall, AccNever | AccNo), v] | [FMethod(_), TFun(_, v)]:
@@ -63,7 +63,7 @@ class Macro {
 	public static function populate(def:TypeDefinition, fields:Array<Entry>, kind:PubSubKind, getFactory:Entry->Expr) {
 		for(f in fields) {
 			var name = f.field.name;
-			var msgCt = f.type.toComplex();
+			// var msgCt = f.types.message.toComplex();
 			var factory = getFactory(f);
 			
 			switch f.variant {
@@ -80,7 +80,11 @@ class Macro {
 					}).fields);
 					
 				case Func(args):
-					var ct = macro:why.pubsub.$kind<$msgCt>;
+					var ct = macro:why.pubsub.$kind;
+					switch ct {
+						case TPath(tp): tp.params = f.types.map(t -> TPType(t.toComplex()));
+						case _: throw 'assert';
+					}
 					
 					var body = switch getMetaWithOneParam(f.field, ':pubsub.cache') {
 						case Some(cache):
@@ -119,7 +123,7 @@ enum abstract PubSubKind(String) to String {
 
 typedef Entry = {
 	field:ClassField,
-	type:Type,
+	types:Array<Type>,
 	variant:Variant,
 }
 

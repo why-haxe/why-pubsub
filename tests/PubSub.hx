@@ -29,22 +29,26 @@ interface Publishers {
 
 interface Subscribers {
 	@:pubsub({unserialize: v -> tink.core.Error.catchExceptions(haxe.Unserializer.run.bind(v))})
-	@:pubsub.amqp({queue: 'bar', prefetch: 2})
-	@:pubsub.mqtt({topic: 'haxe/why/pubsub/mqtt/foo'})
-	@:pubsub.local({to: 'foo'})
-	var bar(get, never):Subscriber<{foo:Int, bar:String}>;
+	@:pubsub.amqp({queue: 'bar', prefetch: 2, metadata: m -> {key: m.fields.routingKey}})
+	@:pubsub.mqtt({topic: 'haxe/why/pubsub/mqtt/foo', metadata: () -> {key: ''}})
+	@:pubsub.local({to: 'foo', metadata: () -> {key: ''}})
+	var bar(get, never):Subscriber<{foo:Int, bar:String}, Meta>;
 	
 	@:pubsub({unserialize: v -> tink.core.Error.catchExceptions(haxe.Unserializer.run.bind(v))})
-	@:pubsub.amqp({queue: 'variant_$id', prefetch: 2})
-	@:pubsub.mqtt({topic: 'haxe/why/pubsub/mqtt/variant_$id'})
-	@:pubsub.local({to: 'variant_$id'})
+	@:pubsub.amqp({queue: 'variant_$id', prefetch: 2, metadata: m -> {key: m.fields.routingKey}})
+	@:pubsub.mqtt({topic: 'haxe/why/pubsub/mqtt/variant_$id', metadata: () -> {key: ''}})
+	@:pubsub.local({to: 'variant_$id', metadata: () -> {key: ''}})
 	@:pubsub.cache({key: id})
-	function variant(id:String):Subscriber<{foo:Int, bar:String}>;
+	function variant(id:String):Subscriber<{foo:Int, bar:String}, Meta>;
 	
 	@:pubsub({unserialize: v -> tink.core.Error.catchExceptions(haxe.Unserializer.run.bind(v))})
-	@:pubsub.amqp({queue: 'cache_$id', prefetch: 2})
-	@:pubsub.mqtt({topic: 'haxe/why/pubsub/mqtt/cache_$id'})
-	@:pubsub.local({to: 'cache_$id'})
+	@:pubsub.amqp({queue: 'cache_$id', prefetch: 2, metadata: m -> {key: m.fields.routingKey}})
+	@:pubsub.mqtt({topic: 'haxe/why/pubsub/mqtt/cache_$id', metadata: () -> {key: ''}})
+	@:pubsub.local({to: 'cache_$id', metadata: () -> {key: ''}})
 	@:pubsub.cache({key: id + foo + bar})
-	function cache(id:String, foo:Int, bar:Bool):Subscriber<{foo:Int, bar:String}>;
+	function cache(id:String, foo:Int, bar:Bool):Subscriber<{foo:Int, bar:String}, Meta>;
+}
+
+typedef Meta = {
+	final key:String;
 }

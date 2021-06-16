@@ -3,10 +3,11 @@ package why.pubsub;
 import tink.Chunk;
 using tink.CoreApi;
 
-interface Envelope<Message> {
+interface Envelope<Message, Metadata> {
 	final id:String;
 	final raw:Chunk;
 	final content:Lazy<Outcome<Message, Error>>;
+	final metadata:Lazy<Metadata>;
 	
 	/*
 		The following methods are only relevant for message-queue-style pub/sub such as AMQP (e.g. RabbitMQ)
