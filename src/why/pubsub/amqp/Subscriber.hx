@@ -73,10 +73,10 @@ class Envelope<Message, Metadata> implements why.pubsub.Envelope<Message, Metada
 	}
 	
 	public function ack():Void {
-		channel.ack(native);
+		try channel.ack(native) catch(_) {}
 	}
 	
 	public function nack():Void {
-		channel.nack(native);
+		try channel.nack(native) catch(_) {}
 	}
 }
