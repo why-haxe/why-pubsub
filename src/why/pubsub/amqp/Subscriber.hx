@@ -23,16 +23,23 @@ class Subscriber<Message, Metadata> implements why.pubsub.Subscriber<Message, Me
 	public function subscribe(handler:Handler<Message, Metadata>):Subscription {
 		var wrapper = manager.createChannel({
 			setup: channel -> {
+				// final wrapper = js.Lib.nativeThis;
 				channel.prefetch(config.prefetch);
-				channel.consume(config.queue, function(msg) {
+				channel.consume(config.queue, msg -> {
 					var envelope:why.pubsub.Envelope<Message, Metadata> = new Envelope(channel, msg, msg.content, config.unserialize.bind(msg.content), config.metadata.bind(merge(msg)));
-					handler(envelope);
+					
+					// try catch the handler so that the channel won't get ruined by uncaught exceptions
+					// might be related: https://github.com/jwalton/node-amqp-connection-manager/issues/190
+					try handler(envelope) catch(e) {
+						js.Node.console.error(e);
+						envelope.nack();
+					}
 				});
 				js.lib.Promise.resolve();
 			}
 		});
 		
-		var error = new Signal(cb -> {
+		final error = new Signal(cb -> {
 			wrapper.on('error', function onError(e)
 				cb #if (tink_core < "2").invoke #end (Error.ofJsError(e)));
 			wrapper.removeListener.bind('error', onError);
