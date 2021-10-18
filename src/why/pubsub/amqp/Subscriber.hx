@@ -31,7 +31,7 @@ class Subscriber<Message, Metadata> implements why.pubsub.Subscriber<Message, Me
 					// try catch the handler so that the channel won't get ruined by uncaught exceptions
 					// might be related: https://github.com/jwalton/node-amqp-connection-manager/issues/190
 					try handler(envelope) catch(e) {
-						js.Node.console.error(e);
+						trace(e);
 						envelope.nack();
 					}
 				});
