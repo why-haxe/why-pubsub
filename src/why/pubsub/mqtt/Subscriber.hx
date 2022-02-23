@@ -28,7 +28,7 @@ class Subscriber<Message, Metadata> implements why.pubsub.Subscriber<Message, Me
 		
 		final binding2 = client.messageReceived.handle(message -> {
 			if(config.topic.match(message.topic))
-				handler(new Envelope(message.payload, config.unserialize.bind(message.payload), config.metadata));
+				handler(new Envelope(message.payload, config.unserialize.bind(message.payload), config.metadata.bind(message)));
 		});
 		
 		return new SimpleSubscription(() -> {
@@ -42,7 +42,7 @@ typedef SubscriberConfig<Message, Metadata> = {
 	final topic:why.mqtt.Topic;
 	final ?qos:Qos;
 	final unserialize:Chunk->Outcome<Message, Error>;
-	final metadata:()->Metadata; // TODO: mqtt meta
+	final metadata:why.mqtt.Message->Metadata; // TODO: mqtt meta
 }
 
 class Envelope<Message, Metadata> implements why.pubsub.Envelope<Message, Metadata> {
